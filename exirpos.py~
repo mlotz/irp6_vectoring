@@ -17,7 +17,7 @@ class exirpos(IRPOS):
 		#wait minimum 100ms before and after calling this function.
 		
 		if (not(self.PoseInt_ON)):
-			print(self.OKGREEN+'[EXIRPOS]'+self.REDFAIL+'!Error: '+self.robot_name+'mPoseInt'+'component. Ready for seamless relative movements.'+self.ENDC)
+			print(self.OKGREEN+'[EXIRPOS]'+self.REDFAIL+'!Error: '+self.robot_name+'mPoseInt'+' component is OFF!'+self.ENDC)
 			return
 			
 
@@ -47,12 +47,19 @@ class exirpos(IRPOS):
 
 	def on_pose_int(self):
 		self.conmanSwitch([self.robot_name+'mPoseInt'], [], True)
-		print(self.OKGREEN+'[EXIRPOS] Started '+self.robot_name+'mPoseInt'+'component. Ready for seamless relative movements.'+self.ENDC)
+		print(self.OKGREEN+'[EXIRPOS] Started '+self.robot_name+'mPoseInt'+' component. Ready for seamless relative movements.'+self.ENDC)
 		self.PoseInt_ON = 1
 	def off_pose_int(self):
 		self.conmanSwitch([], [self.robot_name+'mPoseInt'], True)
-		print(self.OKGREEN+'[EXIRPOS] STOPPED '+self.robot_name+'mPoseInt'+'component.Seamless relative movements disabled.'+self.ENDC)
+		print(self.OKGREEN+'[EXIRPOS] STOPPED '+self.robot_name+'mPoseInt'+' component.Seamless relative movements disabled.'+self.ENDC)
 		self.PoseInt_ON= 0
+	def EX_print_wrench(self):
+		self.conmanSwitch([self.robot_name+'mForceTransformation'], [], True)
+		time.sleep(1.0)
+		print('[Cartesian pose]')
+		print str(self.get_force_readings())
+		self.conmanSwitch([], [self.robot_name+'mForceTransformation'], True)
+		
 #MAIN
 
 if __name__ == '__main__':

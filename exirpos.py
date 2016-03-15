@@ -53,6 +53,13 @@ class exirpos(IRPOS):
 		self.conmanSwitch([], [self.robot_name+'mPoseInt'], True)
 		print(self.OKGREEN+'[EXIRPOS] STOPPED '+self.robot_name+'mPoseInt'+' component.Seamless relative movements disabled.'+self.ENDC)
 		self.PoseInt_ON= 0
+	def EX_print_wrench(self):
+		self.conmanSwitch([self.robot_name+'mForceTransformation'], [], True)
+		time.sleep(0.05)
+		print('[Cartesian pose]')
+		print str(self.get_force_readings())
+		self.conmanSwitch([], [self.robot_name+'mForceTransformation'], True)
+		
 #MAIN
 
 if __name__ == '__main__':

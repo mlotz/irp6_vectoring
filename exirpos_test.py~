@@ -52,7 +52,7 @@ def T2():
 	irpos = IRPOS("IRpOS", "Irp6p", 6, "irp6p_manager")
 
 	print "Irp6p: Behavior: T2 - Starting."
-	joint_trajectory = [JointTrajectoryPoint([0.0, -1.5707963268, 0.0, 0.0, 4.7123889804 , 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [], [], rospy.Duration(15.0))]
+	joint_trajectory = [JointTrajectoryPoint([0.0, -1.5707963268, 0.0, 0.0, 4.7123889804 , 0.0], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [], [], rospy.Duration(20.0))]
 	irpos.move_along_joint_trajectory(joint_trajectory)
 	
 	print "Irp6p: Behavior: T2 - done."
@@ -96,10 +96,12 @@ def T5():
 	
 def T6():
 	#irpos = IRPOS("IRpOS", "Irp6ot", 7 , "irp6ot_manager")
-	irpos = IRPOS("IRpOS", "Irp6ot", 7)
+	#irpos = IRPOS("IRpOS", "Irp6ot", 7)
+	irpos = IRPOS("IRpOS", "Irp6p", 6, "irp6p_manager")
 	print "Irp6ot: Behavior: T6 - Grabbing."
-	
-	irpos.tfg_to_joint_position(0.064, 10.0)
+	# grabbed 0.061
+	# dropped 0.065
+	irpos.tfg_to_joint_position(0.065, 10.0)
 	
 	print str(irpos.get_tfg_joint_position())
 
@@ -169,7 +171,20 @@ def TC():
 	irpos.move_to_synchro_position(10.0)
 	
 	print "Irp6ot: Behavior: TC - done. Current position at center"
+def ToContact():
+	print "Irp6ot: Behavior: To contact - Synchronizing."
+	irpos.move_to_synchro_position(15.0)
+	joint_trajectory = [JointTrajectoryPoint([0.0, -1.5707963268, 0.0, 0.0, 4.7123889804 , 0.0], [0.0,0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [], [], rospy.Duration(15.0))]
+	irpos.move_along_joint_trajectory(joint_trajectory)
+
+	irpos.move_rel_to_cartesian_pose_with_contact( 20.0, Pose(Point(0.0, 0.0, 0.20), Quaternion(0.0, 0.0, 0.0, 1.0)),Wrench(Vector3(10.0, 10.0, 5.0), Vector3(0.0, 0.0, 0.0)))
+	irpos.move_rel_to_cartesian_pose(2.0, Pose(Point(0.0, 0.0, -0.01), Quaternion(0.0, 0.0, 0.0, 1.0)))
+
+	irpos.move_rel_to_cartesian_pose_with_contact( 20.0, Pose(Point(0.20, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)),Wrench(Vector3(4.0, 4.0, 0.0), Vector3(0.0, 0.0, 0.0)))
+	irpos.EX_print_wrench()
+	print "Irp6ot: Behavior: To contact - done."
 		
+
 def TSynch():
 	irpos = IRPOS("IRpOS", "Irp6p", 6 , "irp6p_manager")
 	#irpos = IRPOS("IRpOS", "Irp6ot", 7)
@@ -284,18 +299,19 @@ def TRacking2():
 
 	joint_trajectory = [JointTrajectoryPoint([0.0, -1.5707963268, 0.0, 0.0, 4.7123889804 , 0.0], [0.0,0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [], [], rospy.Duration(15.0))]
 	irpos.move_along_joint_trajectory(joint_trajectory)
-	irpos.move_rel_to_cartesian_pose(8.0, Pose(Point(0.0, 0.0, 0.05), Quaternion(0.0, 0.0, 0.0, 1.0)))
+	#irpos.move_rel_to_cartesian_pose(8.0, Pose(Point(0.0, 0.0, 0.05), Quaternion(0.0, 0.0, 0.0, 1.0)))
 	irpos.move_rel_to_cartesian_pose(8.0, Pose(Point(-0.1, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
 	current = irpos.get_cartesian_pose()
-	print(str(current.position))
-	print(str(np.sin(-np.pi/2)))
-	#irpos.move_to_cartesian_pose(4.0,Pose(current.position,Quaternion(np.sin(-np.pi/2),np.sin(-np.pi/2),0.0,1.0)))
+	#print(str(current.position))
+	#print(str(np.sin(-np.pi/2)))
+	#irpos.move_to_cartesian_pose(4.0,Pose(current.position,Quaternion(np.sin(-np.pi/4),np.sin(-np.pi/4),0.0,0.0)))
 	time.sleep(1.0)
 	
 	angle = 0
 	step = 0.001
 	speed =0.01
 	contactForce= 0.0
+	zVConstraint = 0.005
 	#forcecontrol 
 	weight = 10.8
   	mass_center = Vector3(0.004, 0.0, 0.156)
@@ -307,21 +323,36 @@ def TRacking2():
 	#wrench = Wrench(Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0))
   	twist = Twist(Vector3(0.0, speed, 0.0), Vector3(0.0, 0.0, 0.0))
 	print('[Cartesian pose]')
-	print str(irpos.get_cartesian_pose())
+	current = irpos.get_cartesian_pose()
+	print str(current)
+	zPlane = current.position.z
+	zV = 0.0
+	maxzDelta = 0.0
 	time.sleep(1.0)
 	irpos.start_force_controller(inertia, reciprocaldamping, wrench, twist)
 	for iter in range(0,719):
 		time.sleep(0.04)
 		setMarker(iter,0.5)
 		angle = iter * (np.pi/360);
+
+		current = irpos.get_cartesian_pose()
 		#irpos.seamless_move_rel_to_cartesian_pose(0.04, Pose(Point(np.sin(angle)*step, np.cos(angle)*step, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
 		wrench = Wrench(Vector3(np.sin(angle-(np.pi/2))*contactForce, np.cos(angle-(np.pi/2))*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
 		#wrench = Wrench(Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0))
-		twist = Twist(Vector3(np.sin(angle)*speed, np.cos(angle)*speed, 0.0), Vector3(0.0, 0.0, 0.0))
+		zDelta = zPlane - current.position.z
+		if (zDelta > maxzDelta):
+			maxzDelta = zDelta
+		zV = -zDelta*0.5
+		#print 'Delta Z:'+str(zDelta)+ 'so zV is:' +str(zV)
+		if (zV>zVConstraint):
+			print irpos.REDFAIL+'[ERROR] zV>'+str(zVConstraint)+'! On iteration:'+str(iter)+irpos.ENDC
+			break
+		twist = Twist(Vector3(np.sin(angle)*speed, np.cos(angle)*speed, zV), Vector3(0.0, 0.0, 0.0))
 		irpos.set_force_controller_goal(inertia, reciprocaldamping, wrench, twist)
 	irpos.stop_force_controller()
 	print('[Cartesian pose]')
 	print str(irpos.get_cartesian_pose())	
+	print 'max zDelta = '+str(maxzDelta)
 	time.sleep(1.0)
 	#for iter in range(0,719):
 	#	setMarker(iter,0.0)
@@ -523,3 +554,5 @@ if __name__ == '__main__':
 		TRacking2()
 	elif sys.argv[1]=="RV":
 		rvizzz()
+	elif sys.argv[1]=="TCo":
+		ToContact()
