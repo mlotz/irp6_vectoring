@@ -300,7 +300,7 @@ def TRacking2():
 	joint_trajectory = [JointTrajectoryPoint([0.0, -1.5707963268, 0.0, 0.0, 4.7123889804 , 0.0], [0.0,0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [], [], rospy.Duration(15.0))]
 	irpos.move_along_joint_trajectory(joint_trajectory)
 	#irpos.move_rel_to_cartesian_pose(8.0, Pose(Point(0.0, 0.0, 0.05), Quaternion(0.0, 0.0, 0.0, 1.0)))
-	irpos.move_rel_to_cartesian_pose(8.0, Pose(Point(-0.1, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
+	irpos.move_rel_to_cartesian_pose(8.0, Pose(Point(0.1, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
 	current = irpos.get_cartesian_pose()
 	#print(str(current.position))
 	#print(str(np.sin(-np.pi/2)))
@@ -309,7 +309,7 @@ def TRacking2():
 	
 	angle = 0
 	step = 0.001
-	speed =0.01
+	speed =0.005
 	contactForce= 0.0
 	zVConstraint = 0.005
 	#forcecontrol 
@@ -330,10 +330,11 @@ def TRacking2():
 	maxzDelta = 0.0
 	time.sleep(1.0)
 	irpos.start_force_controller(inertia, reciprocaldamping, wrench, twist)
+	#for iter in range(0,719):
 	for iter in range(0,719):
 		time.sleep(0.04)
 		setMarker(iter,0.5)
-		angle = iter * (np.pi/360);
+		angle = -iter * (np.pi/360);
 
 		current = irpos.get_cartesian_pose()
 		#irpos.seamless_move_rel_to_cartesian_pose(0.04, Pose(Point(np.sin(angle)*step, np.cos(angle)*step, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
@@ -362,6 +363,102 @@ def TRacking2():
 	joint_trajectory = [JointTrajectoryPoint([0.0, -1.5707963268, 0.0, 0.0, 4.7123889804 , 0.0], [0.0,0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [], [], rospy.Duration(20.0))]
 	irpos.move_along_joint_trajectory(joint_trajectory)
 	print "Irp6p: Behavior: TRacking2 - done."
+
+def TRacking3():
+
+	print "Irp6p: Behavior: TRacking3 - Starting."
+	
+	T2()
+	#ToContact()
+
+	time.sleep(1.0)
+	
+	angle = 0
+	#step = 0.001
+	speed =0.005
+	contactForce= 2.0
+	zVConstraint = 0.005
+	#forcecontrol 
+	weight = 10.8
+  	mass_center = Vector3(0.004, 0.0, 0.156)
+	irpos.set_tool_physical_params( weight , mass_center)
+	inertia = Inertia(Vector3(0.0, 0.0, 0.0), Vector3(0.5, 0.5, 0.5))
+  	reciprocaldamping = ReciprocalDamping(Vector3(0.0012, 0.0012, 0.0012), Vector3(0.0, 0.0, 0.0))
+  	wrench = Wrench(Vector3(np.sin(angle+(np.pi/2))*contactForce, np.cos(angle+(np.pi/2))*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
+	#wrench = Wrench(Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0))
+  	twist = Twist(Vector3(0.0, speed, 0.0), Vector3(0.0, 0.0, 0.0))
+	print('[Cartesian pose]')
+	current = irpos.get_cartesian_pose()
+	print str(current)
+	zPlane = current.position.z
+	zV = 0.0
+	maxzDelta = 0.0
+	time.sleep(1.0)
+	irpos.start_force_controller(inertia, reciprocaldamping, wrench, twist)
+	for iter in range(0,719):
+		time.sleep(0.04)
+		#setMarker(iter,0.5)
+		angle = -iter * (np.pi/360)- np.pi/2;
+		
+		onWrench = irpos.get_force_readings()
+		onWrench.force.x = 1.0 * sin(angle)
+		onWrench.force.y = 1.0 * cos(angle)
+		#onWrench.force.x = -1.0 
+		#onWrench.force.y = 0.0 
+		#onWrench.force.x = 0.0 
+		#onWrench.force.y = -1.0 
+		#print str(onWrench.force.x)
+		Fxy = np.sqrt(onWrench.force.x*onWrench.force.x+onWrench.force.y*onWrench.force.y)
+		sinAlfa = onWrench.force.y/Fxy
+		cosAlfa = onWrench.force.x/Fxy
+		#if(Fxy<1.0):
+		#	sinAlfa = 0.0
+		#	cosAlfa = -1.0
+		#angle = np.arcsin(sinAlfa)
+		#print 'Fxy ='+str(Fxy) 
+		reactionForceAngle=np.angle(onWrench.force.y+onWrench.force.x*(0+1j))
+		vectorAngle = reactionForceAngle + np.pi/2
+		givenForceAngle = reactionForceAngle + np.pi
+		print 'Angles:Fxy='+str(np.degrees(reactionForceAngle))
+		setMarker(iter,0.5,reactionForceAngle, vectorAngle, givenForceAngle)
+		#updateArrows()
+
+		current = irpos.get_cartesian_pose()
+		#irpos.seamless_move_rel_to_cartesian_pose(0.04, Pose(Point(np.sin(angle)*step, np.cos(angle)*step, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
+		#wrench = Wrench(Vector3(np.sin(angle-(np.pi/2))*contactForce, np.cos(angle-(np.pi/2))*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
+		#wrench = Wrench(Vector3((sinAlfa-np.pi/2)*contactForce, (cosAlfa-np.pi/2)*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
+		##wrench = Wrench(Vector3(-cosAlfa*contactForce, sinAlfa*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
+		#wrench = Wrench(Vector3(cosAlfa*contactForce, -sinAlfa*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
+		#wrench = Wrench(Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0))
+		wrench = Wrench(Vector3(np.sin(givenForceAngle)*contactForce, np.cos(givenForceAngle)*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
+		zDelta = zPlane - current.position.z
+		if (zDelta > maxzDelta):
+			maxzDelta = zDelta
+		zV = -zDelta*0.5
+		
+		if (Fxy>6.0):
+			print irpos.REDFAIL+'[ERROR] Fxy>'+str(6.0)+'! On iteration:'+str(iter)+irpos.ENDC
+			break
+		if (zV>zVConstraint):
+			print irpos.REDFAIL+'[ERROR] zV>'+str(zVConstraint)+'! On iteration:'+str(iter)+irpos.ENDC
+			break
+		#twist = Twist(Vector3(np.sin(angle)*speed, np.cos(angle)*speed, zV), Vector3(0.0, 0.0, 0.0))
+		#twist = Twist(Vector3(sinAlfa*speed, cosAlfa*speed, zV), Vector3(0.0, 0.0, 0.0))
+		twist = Twist(Vector3(np.sin(vectorAngle)*speed, np.cos(vectorAngle)*speed, zV), Vector3(0.0, 0.0, 0.0))
+		irpos.set_force_controller_goal(inertia, reciprocaldamping, wrench, twist)
+	irpos.stop_force_controller()
+	print('[Cartesian pose]')
+	print str(irpos.get_cartesian_pose())	
+	print 'max zDelta = '+str(maxzDelta)
+	time.sleep(1.0)
+	#for iter in range(0,719):
+	#	setMarker(iter,0.0)
+	#	time.sleep(0.005)
+
+
+	joint_trajectory = [JointTrajectoryPoint([0.0, -1.5707963268, 0.0, 0.0, 4.7123889804 , 0.0], [0.0,0.0, 0.0, 0.0, 0.0, 0.0, 0.0], [], [], rospy.Duration(20.0))]
+	irpos.move_along_joint_trajectory(joint_trajectory)
+	print "Irp6p: Behavior: TRacking3 - done."
 
 def irp6p_multi_trajectory2():
 	irpos = IRPOS("IRpOS", "Irp6p", 6)
@@ -464,7 +561,8 @@ def test():
 	
 
 	print 'END TEST'
-def setMarker(nrId,c):
+def setMarker(nrId,c, reactionForceAngle, vectorAngle, givenForceAngle):
+#def setMarker(nrId,c):
 	
 	#print('asasdsda')
 
@@ -475,7 +573,7 @@ def setMarker(nrId,c):
 	marker.header.frame_id = "/pl_base"
 	#marker.header.stamp = rospy.get_rostime() + rospy.Duration(0.002)
 	marker.ns = "basic_shapes"
-	marker.id = nrId
+	marker.id = nrId+10
 	marker.type = marker.SPHERE
 	marker.action = marker.ADD
 	#marker.pose.position.x = 1.0
@@ -499,6 +597,57 @@ def setMarker(nrId,c):
 	
 	#print(str(rviz_pub.getNumSubscribers()))
 	
+	rviz_pub.publish(marker)
+	
+	#arrow
+	marker.scale.x = 0.05
+	marker.scale.y = 0.002
+	marker.scale.z = 0.002
+	marker.id = 0
+	marker.type = marker.ARROW
+	
+	marker.pose.orientation.x = 0.0
+	marker.pose.orientation.y = 0.0
+	marker.pose.orientation.z = np.sin(reactionForceAngle/2)
+	marker.pose.orientation.w = np.cos(reactionForceAngle/2)
+	marker.color.r = 1.0
+	marker.color.g = 0.0
+	marker.color.b = 0.0
+	marker.color.a = 1.0
+	rviz_pub.publish(marker)
+	
+	#arrow
+	marker.scale.x = 0.05
+	marker.scale.y = 0.002
+	marker.scale.z = 0.002
+	marker.id = 1
+	marker.type = marker.ARROW
+	
+	marker.pose.orientation.x = 0.0
+	marker.pose.orientation.y = 0.0
+	marker.pose.orientation.z = np.sin(vectorAngle/2)
+	marker.pose.orientation.w = np.cos(vectorAngle/2)
+	marker.color.r = 0.0
+	marker.color.g = 1.0
+	marker.color.b = 0.0
+	marker.color.a = 1.0
+	rviz_pub.publish(marker)
+
+	#arrow
+	marker.scale.x = 0.05
+	marker.scale.y = 0.002
+	marker.scale.z = 0.002
+	marker.id = 2
+	marker.type = marker.ARROW
+	
+	marker.pose.orientation.x = 0.0
+	marker.pose.orientation.y = 0.0
+	marker.pose.orientation.z = np.sin(givenForceAngle/2)
+	marker.pose.orientation.w = np.cos(givenForceAngle/2)
+	marker.color.r = 0.0
+	marker.color.g = 0.0
+	marker.color.b = 1.0
+	marker.color.a = 1.0
 	rviz_pub.publish(marker)
 def delMarker(nrId):
 	marker.id = nrId
@@ -552,6 +701,8 @@ if __name__ == '__main__':
 		TRacking()
 	elif sys.argv[1]=="TR2":
 		TRacking2()
+	elif sys.argv[1]=="TR3":
+		TRacking3()
 	elif sys.argv[1]=="RV":
 		rvizzz()
 	elif sys.argv[1]=="TCo":
