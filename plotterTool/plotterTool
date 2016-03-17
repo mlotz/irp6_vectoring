@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+
+#Warning Orocos Reporting component leaves space on last line. Delete it before reading log.(@IndexError: list of index out of range)
+f = open('/home/mlotz/orocosPoligon/old_repo/reports.dat', 'r')
+lines = f.readlines()
+f.close
+
+timestamp = []
+x = []
+y = []
+z = []
+
+once = 0
+
+for line in lines:
+	if (once == 0):
+		once = 1
+		continue
+	p = line.split()
+	#print str(p[0])
+	timestamp.append(float(p[0]))
+	x.append(float(p[1]))
+	y.append(float(p[2]))
+	z.append(float(p[3]))
+
+
+tv = np.array(timestamp)
+xv = np.array(x)
+yv = np.array(y)
+zv = np.array(z)
+fig1= plt.figure()
+plt.plot(tv,xv)
+fig2= plt.figure()
+plt.plot(tv,yv)
+fig3= plt.figure()
+plt.scatter(xv,yv)
+fig4= plt.figure()
+plt.plot(tv,zv)
+plt.show()
+
+
+
