@@ -59,6 +59,14 @@ class exirpos(IRPOS):
 		print('[Cartesian pose]')
 		print str(self.get_force_readings())
 		self.conmanSwitch([], [self.robot_name+'mForceTransformation'], True)
+
+	def start_cartesian_logging(self):
+		self.conmanSwitch(['repo'], [], True)
+		print(self.OKGREEN+'[EXIRPOS] Started logging'+' component.'+self.ENDC)
+	def stop_cartesian_logging(self):
+		self.conmanSwitch([], ['repo'], True)
+		print(self.OKGREEN+'[EXIRPOS] Stopped logging'+' component.'+self.ENDC)
+		self.PoseInt_ON= 0
 		
 #MAIN
 

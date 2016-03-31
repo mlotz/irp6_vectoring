@@ -15,7 +15,6 @@ x = []
 y = []
 z = []
 
-
 once = 0
 
 for line in lines:
@@ -35,12 +34,12 @@ xv = np.array(x)
 yv = np.array(y)
 zv = np.array(z)
 fig1= plt.figure()
-plt.plot(tv,yv)
+plt.plot(tv,xv)
 plt.title('x over time', fontsize=20)
 plt.xlabel('time[s]')
 plt.ylabel('x[m]')
 fig2= plt.figure()
-plt.plot(tv,xv)
+plt.plot(tv,yv)
 plt.title('y over time', fontsize=20)
 plt.xlabel('time[s]')
 plt.ylabel('y[m]')
@@ -52,8 +51,8 @@ plt.plot(tv,zv)
 
 
 fig4= plt.figure()
-plt.xlabel('y[m]')
-plt.ylabel('x[m]')
+plt.xlabel('x[m]')
+plt.ylabel('y[m]')
 plt.title('end effector trajectory on XY plane', fontsize=20)
 plt.axis('equal')
 plt.scatter(xv,yv)

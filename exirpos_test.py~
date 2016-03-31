@@ -178,7 +178,7 @@ def ToContact():
 	irpos.move_along_joint_trajectory(joint_trajectory)
 
 	irpos.move_rel_to_cartesian_pose_with_contact( 20.0, Pose(Point(0.0, 0.0, 0.20), Quaternion(0.0, 0.0, 0.0, 1.0)),Wrench(Vector3(10.0, 10.0, 7.0), Vector3(0.0, 0.0, 0.0)))
-	irpos.move_rel_to_cartesian_pose(2.0, Pose(Point(0.0, 0.0, -0.01), Quaternion(0.0, 0.0, 0.0, 1.0)))
+	irpos.move_rel_to_cartesian_pose(2.0, Pose(Point(0.0, 0.0, -0.007), Quaternion(0.0, 0.0, 0.0, 1.0)))
 
 	irpos.move_rel_to_cartesian_pose_with_contact( 20.0, Pose(Point(0.20, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)),Wrench(Vector3(6.0, 6.0, 0.0), Vector3(0.0, 0.0, 0.0)))
 	irpos.move_rel_to_cartesian_pose(4.0, Pose(Point(-0.02, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
@@ -193,6 +193,11 @@ def TSynch():
 	irpos.move_to_synchro_position(10.0)
 
 	print "Irp6ot: Behavior: TS - done."
+
+def TestLogging():
+	start_cartesian_logging()
+	time.sleep(5.0)
+	stop_cartesian_logging()
 
 def TRacking3():
 
@@ -554,3 +559,5 @@ if __name__ == '__main__':
 		rvizzz()
 	elif sys.argv[1]=="TCo":
 		ToContact()
+	elif sys.argv[1]=="TL":
+		TestLogging()

@@ -194,6 +194,11 @@ def TSynch():
 
 	print "Irp6ot: Behavior: TS - done."
 
+def TestLogging():
+	irpos.start_cartesian_logging()
+	time.sleep(5.0)
+	irpos.stop_cartesian_logging()
+
 def TRacking3():
 
 	print "Irp6p: Behavior: TRacking3 - Starting."
@@ -554,3 +559,5 @@ if __name__ == '__main__':
 		rvizzz()
 	elif sys.argv[1]=="TCo":
 		ToContact()
+	elif sys.argv[1]=="TL":
+		TestLogging()
