@@ -195,9 +195,9 @@ def TSynch():
 	print "Irp6ot: Behavior: TS - done."
 
 def TestLogging():
-	irpos.start_cartesian_logging()
+	irpos.start_logging()
 	time.sleep(5.0)
-	irpos.stop_cartesian_logging()
+	irpos.stop_logging()
 
 def TRacking3():
 
@@ -232,10 +232,11 @@ def TRacking3():
 	zPlane = current.position.z
 	zV = 0.0
 	maxzDelta = 0.0
+	irpos.start_logging()
 	time.sleep(1.0)
 	irpos.start_force_controller(inertia, reciprocaldamping, wrench, twist)
-	#for iter in range(0,719):
-	for iter in range(0,2000):
+	for iter in range(0,719):
+	#for iter in range(0,2000):
 		time.sleep(0.04)
 		#setMarker(iter,0.5)
 		angle = -iter * (np.pi/360)- np.pi/2;
@@ -299,6 +300,7 @@ def TRacking3():
 		twist = Twist(Vector3(np.sin(vectorAngle)*speed, np.cos(vectorAngle)*speed, zV), Vector3(0.0, 0.0, 0.0))
 		irpos.set_force_controller_goal(inertia, reciprocaldamping, wrench, twist)
 	irpos.stop_force_controller()
+	irpos.stop_logging()
 	print('[Cartesian pose]')
 	print str(irpos.get_cartesian_pose())	
 	print 'max zDelta = '+str(maxzDelta)

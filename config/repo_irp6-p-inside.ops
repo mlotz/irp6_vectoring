@@ -608,6 +608,54 @@ Irp6pScheme.addBlock("Irp6pmToolInt");
 
 
 
+
+//
+// Reporting Components
+//
+
+//Cartesian Position
+//loadComponent("repoCartesian","OCL::FileReporting")
+//loadService("repoCartesian","marshalling")
+//addPeer("repoCartesian","Irp6pmForwardKinematic")
+//repoCartesian.setPeriod(0.002)
+//repoCartesian.reportPort("Irp6pmForwardKinematic","EndEffectorOutputPose")
+//repoCartesian.marshalling.loadProperties("/home/mlotz/orocosPoligon/repoCartesianConf.cpf")
+
+//addPeer("Irp6pScheme", "repoCartesian");
+//Irp6pScheme.addBlock("repoCartesian");
+
+//Wrench
+//loadComponent("repoWrench","OCL::FileReporting")
+//loadService("repoWrench","marshalling")
+//addPeer("repoWrench","Irp6pmForceTransformation")
+//repoWrench.setPeriod(0.002)
+//repoWrench.reportPort("Irp6pmForceTransformation","OutputEndEffectorWrench")
+//repoWrench.marshalling.loadProperties("/home/mlotz/orocosPoligon/repoWrenchConf.cpf")
+
+//addPeer("Irp6pScheme", "repoWrench");
+//Irp6pScheme.addBlock("repoWrench");
+
+
+//Uni
+loadComponent("repoUni","OCL::FileReporting")
+loadService("repoUni","marshalling")
+addPeer("repoUni","Irp6pmForwardKinematic")
+addPeer("repoUni","Irp6pmForceTransformation")
+repoUni.setPeriod(0.002)
+repoUni.reportPort("Irp6pmForwardKinematic","EndEffectorOutputPose")
+repoUni.reportPort("Irp6pmForceTransformation","OutputEndEffectorWrench")
+repoUni.marshalling.loadProperties("/home/mlotz/orocosPoligon/repoUniConf.cpf")
+
+addPeer("Irp6pScheme", "repoUni");
+Irp6pScheme.addBlock("repoUni");
+
+//Repo end
+
+
+
+
+
+
 // ROS Interface
 
 //
@@ -893,9 +941,4 @@ Irp6pHardwareInterface.start()
 Irp6pHwModel.start()
 Irp6pDiag.start()
 
-loadComponent("repo","OCL::FileReporting")
-loadService("repo","marshalling")
-addPeer("repo","Irp6pmForwardKinematic")
-repo.setPeriod(0.002)
-repo.reportPort("Irp6pmForwardKinematic","EndEffectorOutputPose")
-repo.marshalling.loadProperties("/home/mlotz/orocosPoligon/repoConf.cpf")
+
