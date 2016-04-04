@@ -232,8 +232,8 @@ def TRacking3():
 	zPlane = current.position.z
 	zV = 0.0
 	maxzDelta = 0.0
-	time.sleep(1.0)
 	irpos.start_logging()
+	time.sleep(1.0)
 	irpos.start_force_controller(inertia, reciprocaldamping, wrench, twist)
 	for iter in range(0,719):
 	#for iter in range(0,2000):

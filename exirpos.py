@@ -61,10 +61,10 @@ class exirpos(IRPOS):
 		self.conmanSwitch([], [self.robot_name+'mForceTransformation'], True)
 
 	def start_logging(self):
-		self.conmanSwitch(['repoWrench','repoCartesian'], [], True)
+		self.conmanSwitch(['repoUni'], [], True)
 		print(self.OKGREEN+'[EXIRPOS] Started logging'+' components.'+self.ENDC)
 	def stop_logging(self):
-		self.conmanSwitch([], ['repoWrench','repoCartesian'], True)
+		self.conmanSwitch([], ['repoUni'], True)
 		print(self.OKGREEN+'[EXIRPOS] Stopped logging'+' components.'+self.ENDC)
 		#self.PoseInt_ON= 0
 		
