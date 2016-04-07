@@ -101,7 +101,7 @@ def T6():
 	print "Irp6ot: Behavior: T6 - Grabbing."
 	# grabbed 0.061
 	# dropped 0.065
-	irpos.tfg_to_joint_position(0.065, 10.0)
+	irpos.tfg_to_joint_position(0.061, 10.0)
 	
 	print str(irpos.get_tfg_joint_position())
 
@@ -235,8 +235,8 @@ def TRacking3():
 	irpos.start_logging()
 	time.sleep(1.0)
 	irpos.start_force_controller(inertia, reciprocaldamping, wrench, twist)
-	for iter in range(0,719):
-	#for iter in range(0,2000):
+	#for iter in range(0,719):
+	for iter in range(0,5000):
 		time.sleep(0.04)
 		#setMarker(iter,0.5)
 		angle = -iter * (np.pi/360)- np.pi/2;

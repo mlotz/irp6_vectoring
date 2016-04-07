@@ -9,7 +9,7 @@ ros.import("irp6tfg_kinematic")
 ros.import("force_control")
 ros.import("irp6_force_sensor")
 
-runScript( "~/mlotz/ws_irp6/mlotz/src/mlotz_pkg/src/config/repo_irp6-p-inside.ops")
+runScript( ros.find("irp6_bringup") + "/config/irp6-p-inside.ops")
 
 
 

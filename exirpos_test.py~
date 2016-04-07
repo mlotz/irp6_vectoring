@@ -235,8 +235,8 @@ def TRacking3():
 	irpos.start_logging()
 	time.sleep(1.0)
 	irpos.start_force_controller(inertia, reciprocaldamping, wrench, twist)
-	for iter in range(0,719):
-	#for iter in range(0,2000):
+	#for iter in range(0,719):
+	for iter in range(0,2000):
 		time.sleep(0.04)
 		#setMarker(iter,0.5)
 		angle = -iter * (np.pi/360)- np.pi/2;
