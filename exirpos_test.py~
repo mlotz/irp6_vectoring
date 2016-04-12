@@ -209,9 +209,15 @@ def TRacking3():
 	time.sleep(1.0)
 	
 	angle = 0
+	counter = 0
+	once = 1
 	reactionForceAngle = np.pi/2
 	#step = 0.001
-	speed =0.005
+	nominalSpeed = 0.01
+	#nominalSpeed = 0.015 nope
+	speed =0.000
+	#speed =0.005
+	nominalContactForce=4.0
 	contactForce= 4.0
 	#speed =0.0
 	#contactForce= 0.0
@@ -228,20 +234,25 @@ def TRacking3():
   	twist = Twist(Vector3(0.0, -speed, 0.0), Vector3(0.0, 0.0, 0.0))
 	print('[Cartesian pose]')
 	current = irpos.get_cartesian_pose()
+	print '[OverScript] print Cartesian Pose'
 	print str(current)
 	zPlane = current.position.z
 	zV = 0.0
 	maxzDelta = 0.0
-	irpos.start_logging()
 	time.sleep(1.0)
 	irpos.start_force_controller(inertia, reciprocaldamping, wrench, twist)
+	time.sleep(0.1)
+	irpos.start_logging()
+	time.sleep(0.1)
 	#for iter in range(0,719):
-	for iter in range(0,2000):
-		time.sleep(0.04)
+	#for iter in range(0,20000):
+	while (1):
+		time.sleep(0.01)
 		#setMarker(iter,0.5)
-		angle = -iter * (np.pi/360)- np.pi/2;
+		#angle = -iter * (np.pi/360)- np.pi/2;
 		
 		onWrench = irpos.get_force_readings()
+		current = irpos.get_cartesian_pose()
 		#onWrench.force.x = 1.0 * sin(angle)
 		#onWrench.force.y = 1.0 * cos(angle)
 		#onWrench.force.x = -1.0 
@@ -261,8 +272,22 @@ def TRacking3():
 		#angle = np.arcsin(sinAlfa)
 		#print 'Fxy ='+str(Fxy) 
 		if(Fxy>2.0):
+			if(Fxy>4.0):
+				speed = nominalSpeed*((2*nominalContactForce)-Fxy)/nominalContactForce
+				if (speed<0.0):
+					speed = 0.0
+			else:
+				speed = nominalSpeed*(Fxy/nominalContactForce)
 			reactionForceAngle=np.angle(onWrench.force.y+onWrench.force.x*(0+1j))
 			#reactionForceAngle=np.angle(onWrench.force.x+onWrench.force.y*(0+1j))
+			if (once == 1):
+				once = 0
+				end = current
+				print '[OverScript] Setting end condition to'
+				print str(end)
+		else:
+			speed = 0.0
+
 		#vectorAngle = reactionForceAngle + np.pi/2
 		vectorAngle = reactionForceAngle + np.pi/2
 		#if (vectorAngle>2*np.pi):
@@ -273,10 +298,11 @@ def TRacking3():
 			#reactionForceAngle = np.pi/2
 		#print 'Angles:reactionForceAngle='+str(np.degrees(reactionForceAngle))+'|Fxy='+str(Fxy)
 		#print str(iter)+'--'+str(reactionForceAngle)+'vect:'+str(vectorAngle)+'x'+str(onWrench.force.x)+'y:'+str(onWrench.force.y)
+		#if(iter%5==0):
 		setMarker(iter,0.5,reactionForceAngle, vectorAngle, givenForceAngle)
 		#updateArrows()
 
-		current = irpos.get_cartesian_pose()
+		
 		#irpos.seamless_move_rel_to_cartesian_pose(0.04, Pose(Point(np.sin(angle)*step, np.cos(angle)*step, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
 		#wrench = Wrench(Vector3(np.sin(angle-(np.pi/2))*contactForce, np.cos(angle-(np.pi/2))*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
 		#wrench = Wrench(Vector3((sinAlfa-np.pi/2)*contactForce, (cosAlfa-np.pi/2)*contactForce, 0.0), Vector3(0.0, 0.0, 0.0))
@@ -295,12 +321,23 @@ def TRacking3():
 		if (zV>zVConstraint):
 			print irpos.REDFAIL+'[ERROR] zV>'+str(zVConstraint)+'! On iteration:'+str(iter)+irpos.ENDC
 			break
+		if (once!=1)and(np.sqrt((current.position.x - end.position.x)*(current.position.x - end.position.x)+(current.position.y - end.position.y)*(current.position.y - end.position.y))<0.008)and(iter>1000):
+			print '[OverSript] End condition reached on iter ='+str(iter)
+			break
 		#twist = Twist(Vector3(np.sin(angle)*speed, np.cos(angle)*speed, zV), Vector3(0.0, 0.0, 0.0))
 		#twist = Twist(Vector3(sinAlfa*speed, cosAlfa*speed, zV), Vector3(0.0, 0.0, 0.0))
 		twist = Twist(Vector3(np.sin(vectorAngle)*speed, np.cos(vectorAngle)*speed, zV), Vector3(0.0, 0.0, 0.0))
 		irpos.set_force_controller_goal(inertia, reciprocaldamping, wrench, twist)
-	irpos.stop_force_controller()
+	time.sleep(0.1)	
+	wrench = Wrench(Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0))
+	twist = Twist(Vector3(0.0, 0.0, 0.0), Vector3(0.0, 0.0, 0.0))
+	irpos.set_force_controller_goal(inertia, reciprocaldamping, wrench, twist)
+	print '[OverScript] Main loop done. Attempting to shut down logging component.'
+	time.sleep(0.1)	
 	irpos.stop_logging()
+	time.sleep(0.1)
+	irpos.stop_force_controller()
+	print '[OverScript] print Cartesian Pose'
 	print('[Cartesian pose]')
 	print str(irpos.get_cartesian_pose())	
 	print 'max zDelta = '+str(maxzDelta)

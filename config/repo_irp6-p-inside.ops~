@@ -902,6 +902,21 @@ Irp6pScheme.latchConnections(Irp6p_hi_component(), "Irp6pmPoseInt", true);
 
 //logging
 
+//Uni
+loadComponent("repoUni","OCL::FileReporting")
+loadService("repoUni","marshalling")
+addPeer("repoUni","Irp6pmForwardKinematic")
+addPeer("repoUni","Irp6pmForceTransformation")
+repoUni.setPeriod(0.002)
+repoUni.reportPort("Irp6pmForwardKinematic","EndEffectorOutputPose")
+repoUni.reportPort("Irp6pmForceTransformation","OutputEndEffectorWrench")
+repoUni.marshalling.loadProperties("/home/mlotz/orocosPoligon/repoUniConf.cpf")
+
+addPeer("Irp6pScheme", "repoUni");
+Irp6pScheme.addBlock("repoUni");
+
+// endLogging
+
 
 
 
