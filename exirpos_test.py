@@ -181,7 +181,7 @@ def ToContact():
 	irpos.move_rel_to_cartesian_pose(2.0, Pose(Point(0.0, 0.0, -0.007), Quaternion(0.0, 0.0, 0.0, 1.0)))
 
 	irpos.move_rel_to_cartesian_pose_with_contact( 20.0, Pose(Point(0.20, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)),Wrench(Vector3(6.0, 6.0, 0.0), Vector3(0.0, 0.0, 0.0)))
-	irpos.move_rel_to_cartesian_pose(4.0, Pose(Point(-0.02, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
+	irpos.move_rel_to_cartesian_pose(4.0, Pose(Point(-0.01, 0.0, 0.0), Quaternion(0.0, 0.0, 0.0, 1.0)))
 	irpos.EX_print_wrench()
 	print "Irp6ot: Behavior: To contact - done."
 		
@@ -213,7 +213,7 @@ def TRacking3():
 	once = 1
 	reactionForceAngle = np.pi/2
 	#step = 0.001
-	nominalSpeed = 0.01
+	nominalSpeed = 0.008
 	#nominalSpeed = 0.015 nope
 	speed =0.000
 	#speed =0.005
@@ -245,6 +245,7 @@ def TRacking3():
 	irpos.start_logging()
 	time.sleep(0.1)
 	#for iter in range(0,719):
+	#for iter in range(0,60000):
 	for iter in range(0,60000):
 	#while (1):
 		time.sleep(0.01)
@@ -274,8 +275,8 @@ def TRacking3():
 		if(Fxy>2.0):
 			if(Fxy>4.0):
 				speed = nominalSpeed*((2*nominalContactForce)-Fxy)/nominalContactForce
-				if (speed<0.0):
-					speed = 0.0
+				if (speed<0.00):
+					speed = 0.00
 			else:
 				speed = nominalSpeed*(Fxy/nominalContactForce)
 			reactionForceAngle=np.angle(onWrench.force.y+onWrench.force.x*(0+1j))
@@ -299,7 +300,10 @@ def TRacking3():
 		#print 'Angles:reactionForceAngle='+str(np.degrees(reactionForceAngle))+'|Fxy='+str(Fxy)
 		#print str(iter)+'--'+str(reactionForceAngle)+'vect:'+str(vectorAngle)+'x'+str(onWrench.force.x)+'y:'+str(onWrench.force.y)
 		#if(iter%5==0):
-		setMarker(iter,0.5,reactionForceAngle, vectorAngle, givenForceAngle)
+		#setMarker(iter,0.5,reactionForceAngle, vectorAngle, givenForceAngle)
+		setArrows(iter,0.5,reactionForceAngle, vectorAngle, givenForceAngle)
+		if(iter%20==0):
+			setDot(iter,0.5,reactionForceAngle, vectorAngle, givenForceAngle)
 		#updateArrows()
 
 		
@@ -315,8 +319,8 @@ def TRacking3():
 			maxzDelta = zDelta
 		zV = -zDelta*0.5
 		
-		if (Fxy>8.0):
-			print irpos.REDFAIL+'[ERROR] Fxy>'+str(8.0)+'! On iteration:'+str(iter)+irpos.ENDC
+		if (Fxy>10.0):
+			print irpos.REDFAIL+'[ERROR] Fxy>'+str(10.0)+'! On iteration:'+str(iter)+irpos.ENDC
 			break
 		if (zV>zVConstraint):
 			print irpos.REDFAIL+'[ERROR] zV>'+str(zVConstraint)+'! On iteration:'+str(iter)+irpos.ENDC
@@ -544,6 +548,132 @@ def delMarker(nrId):
 	marker.id = nrId
 	marker.action = marker.DELETE
 	rviz_pub.publish(marker)
+def setArrows(nrId,c, reactionForceAngle, vectorAngle, givenForceAngle):
+#def setMarker(nrId,c):
+	
+	#print('asasdsda')
+
+	current = irpos.get_cartesian_pose()
+	#marker = Marker()
+	
+
+	marker.header.frame_id = "/pl_base"
+	#marker.header.stamp = rospy.get_rostime() + rospy.Duration(0.002)
+	marker.ns = "basic_shapes"
+	marker.id = nrId+10
+	marker.type = marker.SPHERE
+	marker.action = marker.ADD
+	#marker.pose.position.x = 1.0
+	#marker.pose.position.y = 0.0
+	#marker.pose.position.z = 1.0
+	marker.pose.position.x = current.position.x
+	marker.pose.position.y = current.position.y
+	marker.pose.position.z = current.position.z 
+	marker.pose.orientation.x = 0.0
+	marker.pose.orientation.y = 0.0
+	marker.pose.orientation.z = 0.0
+	marker.pose.orientation.w = 1.0
+	marker.scale.x = 0.003
+	marker.scale.y = 0.003
+	marker.scale.z = 0.003
+	marker.color.r = 0.0
+	marker.color.g = c
+	marker.color.b = 0.0
+	marker.color.a = 1.0
+	#marker.lifetime = rospy.Duration(10.0)
+	
+	#print(str(rviz_pub.getNumSubscribers()))
+	
+	
+	#arrow
+	marker.scale.x = 0.05
+	marker.scale.y = 0.002
+	marker.scale.z = 0.002
+	marker.id = 0
+	marker.type = marker.ARROW
+	
+	marker.pose.orientation.x = 0.0
+	marker.pose.orientation.y = 0.0
+	marker.pose.orientation.z = np.sin(reactionForceAngle/2)
+	marker.pose.orientation.w = np.cos(reactionForceAngle/2)
+	marker.color.r = 1.0
+	marker.color.g = 0.0
+	marker.color.b = 0.0
+	marker.color.a = 1.0
+	rviz_pub.publish(marker)
+	
+	#arrow
+	marker.scale.x = 0.05
+	marker.scale.y = 0.002
+	marker.scale.z = 0.002
+	marker.id = 1
+	marker.type = marker.ARROW
+	
+	marker.pose.orientation.x = 0.0
+	marker.pose.orientation.y = 0.0
+	marker.pose.orientation.z = np.sin(vectorAngle/2)
+	marker.pose.orientation.w = np.cos(vectorAngle/2)
+	marker.color.r = 0.0
+	marker.color.g = 1.0
+	marker.color.b = 0.0
+	marker.color.a = 1.0
+	rviz_pub.publish(marker)
+
+	#arrow
+	marker.scale.x = 0.05
+	marker.scale.y = 0.002
+	marker.scale.z = 0.002
+	marker.id = 2
+	marker.type = marker.ARROW
+	
+	marker.pose.orientation.x = 0.0
+	marker.pose.orientation.y = 0.0
+	marker.pose.orientation.z = np.sin(givenForceAngle/2)
+	marker.pose.orientation.w = np.cos(givenForceAngle/2)
+	marker.color.r = 0.0
+	marker.color.g = 0.0
+	marker.color.b = 1.0
+	marker.color.a = 1.0
+	rviz_pub.publish(marker)
+def setDot(nrId,c, reactionForceAngle, vectorAngle, givenForceAngle):
+#def setMarker(nrId,c):
+	
+	#print('asasdsda')
+
+	current = irpos.get_cartesian_pose()
+	#marker = Marker()
+	
+
+	marker.header.frame_id = "/pl_base"
+	#marker.header.stamp = rospy.get_rostime() + rospy.Duration(0.002)
+	marker.ns = "basic_shapes"
+	marker.id = nrId+10
+	marker.type = marker.SPHERE
+	marker.action = marker.ADD
+	#marker.pose.position.x = 1.0
+	#marker.pose.position.y = 0.0
+	#marker.pose.position.z = 1.0
+	marker.pose.position.x = current.position.x
+	marker.pose.position.y = current.position.y
+	marker.pose.position.z = current.position.z 
+	marker.pose.orientation.x = 0.0
+	marker.pose.orientation.y = 0.0
+	marker.pose.orientation.z = 0.0
+	marker.pose.orientation.w = 1.0
+	marker.scale.x = 0.003
+	marker.scale.y = 0.003
+	marker.scale.z = 0.003
+	marker.color.r = 0.0
+	marker.color.g = c
+	marker.color.b = 0.0
+	marker.color.a = 1.0
+	#marker.lifetime = rospy.Duration(10.0)
+	
+	#print(str(rviz_pub.getNumSubscribers()))
+	
+	rviz_pub.publish(marker)
+	
+
 def rvizzz():
 	rviz_pub.publish(marker)
 

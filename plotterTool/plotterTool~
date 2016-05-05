@@ -72,15 +72,20 @@ plt.plot(tv,fxy)
 plt.savefig('/home/mlotz/orocosPoligon/plots/Fxyt.png')
 
 fig3ipolicwierc= plt.figure()
-mem=50
+mem=200
 plt.xlabel('time[s]')
 plt.ylabel('Fxy[N]')
-plt.title('meanFxy(last10) over time', fontsize=20)
+
 fxy = np.sqrt((twx*twx)+(twy*twy))
 meanfxy = np.array(fxy)
-for index in range(mem,((fxy.size)-mem)):
+#for index in range(mem,((fxy.size)-mem)):
+for index in range(mem,fxy.size):
 	meanfxy[index] = np.mean(fxy[index-mem+1:index])
-	
+	#ameanfxy.append(np.mean(fxy[index-mem+1:index]))
+#meanfxy =  np.array(ameanfxy)	
+#print str(4.0 * np.ones(4))
+E = np.sum(np.power(meanfxy[5000:meanfxy.size]-4.0*np.ones(meanfxy[5000:meanfxy.size].size),2))/fxy.size
+plt.title('meanFxy over time E='+str(E), fontsize=20)
 plt.plot(tv,meanfxy)
 plt.savefig('/home/mlotz/orocosPoligon/plots/meanFxyt.png')
 
@@ -102,4 +107,65 @@ plt.savefig('/home/mlotz/orocosPoligon/plots/xyt.png')
 #plt.show()
 
 
+fig5= plt.figure()
+mem=200
+plt.xlabel('time[s]')
+plt.ylabel('Fx[N]')
+plt.title('meanFx over time', fontsize=20)
+meanfx = np.array(twx)
+#for index in range(mem,((fxy.size)-mem)):
+for index in range(mem,twx.size):
+	meanfx[index] = np.mean(twx[index-mem+1:index])
+	#ameanfxy.append(np.mean(fxy[index-mem+1:index]))
+#meanfxy =  np.array(ameanfxy)	
+plt.plot(tv,meanfx)
+plt.savefig('/home/mlotz/orocosPoligon/plots/meanFxt.png')
 
+
+fig6= plt.figure()
+mem=200
+plt.xlabel('time[s]')
+plt.ylabel('Fy[N]')
+plt.title('meanFy over time', fontsize=20)
+meanfy = np.array(twy)
+#for index in range(mem,((fxy.size)-mem)):
+for index in range(mem,twy.size):
+	meanfy[index] = np.mean(twy[index-mem+1:index])
+	#ameanfxy.append(np.mean(fxy[index-mem+1:index]))
+#meanfxy =  np.array(ameanfxy)	
+plt.plot(tv,meanfy)
+plt.savefig('/home/mlotz/orocosPoligon/plots/meanFyt.png')
+
+
+fig7= plt.figure()
+plt.xlabel('time[s]')
+plt.ylabel('Fx[N]')
+plt.title('Fx over time', fontsize=20)
+plt.plot(tv,twx)
+plt.savefig('/home/mlotz/orocosPoligon/plots/Fxt.png')
+
+fig8= plt.figure()
+plt.xlabel('time[s]')
+plt.ylabel('Fy[N]')
+plt.title('Fy over time', fontsize=20)
+plt.plot(tv,twy)
+plt.savefig('/home/mlotz/orocosPoligon/plots/Fyt.png')
+
+
+fig9= plt.figure()
+mem=200
+plt.xlabel('time[s]')
+plt.ylabel('Fxy(ofMeans)[N]')
+plt.title('Fxy of means over time', fontsize=20)
+fxyofmean = np.sqrt((meanfx*meanfx)+(meanfy*meanfy))
+
+plt.plot(tv,fxyofmean)
+plt.savefig('/home/mlotz/orocosPoligon/plots/Fxytofmeans.png')
+
+fig10= plt.figure()
+plt.xlabel('time[s]')
+plt.ylabel('Fxy[N]')
+plt.title('part of Fxy', fontsize=20)
+
+plt.plot(tv[5420:5440],fxy[5420:5440])
+plt.savefig('/home/mlotz/orocosPoligon/plots/partFxy.png')
