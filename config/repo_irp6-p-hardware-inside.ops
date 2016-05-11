@@ -26,3 +26,5 @@ runScript( ros.find("mlotz_pkg") + "/src/config/repo_irp6-p-inside.ops")
 
 Irp6pHardwareInterface.start()
 Irp6pScheme.start()
+
+Irp6pSupervisor.start()

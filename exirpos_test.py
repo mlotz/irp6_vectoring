@@ -107,6 +107,19 @@ def T6():
 
 	print "Irp6ot: Behavior: T6 - done."
 
+def T7():
+	#irpos = IRPOS("IRpOS", "Irp6ot", 7 , "irp6ot_manager")
+	#irpos = IRPOS("IRpOS", "Irp6ot", 7)
+	irpos = IRPOS("IRpOS", "Irp6p", 6, "irp6p_manager")
+	print "Irp6ot: Behavior: T7 - Dropping."
+	# grabbed 0.061
+	# dropped 0.065
+	irpos.tfg_to_joint_position(0.065, 10.0)
+	
+	print str(irpos.get_tfg_joint_position())
+
+	print "Irp6ot: Behavior: T7 - done."
+
 def TC():
 	#irpos = IRPOS("IRpOS", "Irp6ot", 7 , "irp6ot_manager")
 	irpos = IRPOS("IRpOS", "Irp6ot", 7)
@@ -714,6 +727,8 @@ if __name__ == '__main__':
 		T5()
 	elif sys.argv[1]=="T6":
 		T6()
+	elif sys.argv[1]=="T7":
+		T7()
 	elif sys.argv[1]=="TS":
 		TSynch()
 	elif sys.argv[1]=="TC":
