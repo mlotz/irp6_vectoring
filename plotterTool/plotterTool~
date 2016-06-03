@@ -66,8 +66,10 @@ plt.savefig('/home/mlotz/orocosPoligon/plots/zt.png')
 fig3ipol= plt.figure()
 plt.xlabel('time[s]')
 plt.ylabel('Fxy[N]')
-plt.title('Fxy over time', fontsize=20)
+#plt.title('Fxy over time', fontsize=20)
 fxy = np.sqrt((twx*twx)+(twy*twy))
+#E = np.sum(np.power(fxy[5000:fxy.size]-4.0*np.ones(fxy[5000:fxy.size].size),2))/fxy.size
+plt.title('Fxy over time', fontsize=20)
 plt.plot(tv,fxy)
 plt.savefig('/home/mlotz/orocosPoligon/plots/Fxyt.png')
 
@@ -82,6 +84,8 @@ meanfxy = np.array(fxy)
 for index in range(mem,fxy.size):
 	meanfxy[index] = np.mean(fxy[index-mem+1:index])
 	#ameanfxy.append(np.mean(fxy[index-mem+1:index]))
+for index in range(1,mem-1):
+	meanfxy[index] = meanfxy[mem]
 #meanfxy =  np.array(ameanfxy)	
 #print str(4.0 * np.ones(4))
 E = np.sum(np.power(meanfxy[5000:meanfxy.size]-4.0*np.ones(meanfxy[5000:meanfxy.size].size),2))/fxy.size
